@@ -819,16 +819,20 @@ Example:
     };
 
     try {
-      await fetch(workerUrl, {
+      const res = await fetch(workerUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      // no-cors mode: request was sent, Zapier will process it
-      showStatus('✅ ✅ Order sent to Printavo via Cloudflare! Check Printavo in 30 seconds.', 'success');
-      setTimeout(() => clearAll(), 3000);
+      const result = await res.json();
+      if (result.success) {
+        showStatus('✅ Invoice created in Printavo successfully!', 'success');
+        setTimeout(() => clearAll(), 3000);
+      } else {
+        showStatus('⚠️ Response: ' + JSON.stringify(result), 'error');
+      }
     } catch(e) {
-      showStatus('Error sending to Zapier: ' + e.message, 'error');
+      showStatus('Error: ' + e.message, 'error');
     }
   }
 
