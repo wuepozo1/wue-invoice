@@ -447,9 +447,9 @@
   <div class="api-banner connected" id="apiBanner">
     <div class="api-dot on" id="apiDot"></div>
     <div style="flex:1">
-      <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Zapier → Printavo Webhook</div>
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Cloudflare → Printavo</div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <input type="text" id="zapierUrl" placeholder="Zapier webhook URL..." value="https://wue-printavo.wuepozo.workers.dev" style="font-size:12px;" />
+        <input type="text" id="workerUrl" placeholder="Cloudflare Worker URL..." value="https://wue-printavo.wuepozo.workers.dev" style="font-size:12px;" />
         <button class="btn btn-ghost" onclick="testWebhook()">Test</button>
       </div>
     </div>
@@ -721,14 +721,13 @@ Example:
 
   // Test Zapier Webhook
   async function testWebhook() {
-    const url = document.getElementById('zapierUrl').value.trim();
-    if (!url) { showStatus('Please enter your Zapier webhook URL.', 'error'); return; }
-    showStatus('Sending test ping to Zapier...', 'loading');
+    const url = document.getElementById('workerUrl').value.trim();
+    if (!url) { showStatus('Please enter your Cloudflare Worker URL.', 'error'); return; }
+    showStatus('Testing Cloudflare connection...', 'loading');
     try {
       // Use no-cors mode — Zapier accepts the request but browser won't see the response
-      await fetch(url, {
+      const testRes = await fetch(url, {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test: true, source: 'WUE Invoice Creator' })
       });
@@ -736,7 +735,7 @@ Example:
       document.getElementById('apiDot').className = 'api-dot on';
       document.getElementById('connStatus').style.color = 'var(--accent)';
       document.getElementById('connStatus').textContent = '✓ Connected';
-      showStatus('✓ Zapier webhook ready! Check Zapier to confirm it received the ping.', 'success');
+      showStatus('✓ Cloudflare Worker is connected and ready!', 'success');
     } catch(e) {
       showStatus('Webhook test failed: ' + e.message, 'error');
     }
@@ -781,8 +780,8 @@ Example:
 
   // Create Invoice via Zapier Webhook
   async function createInvoice() {
-    const zapierUrl = document.getElementById('zapierUrl').value.trim();
-    if (!zapierUrl) { showStatus('Please enter your Zapier webhook URL.', 'error'); return; }
+    const workerUrl = document.getElementById('workerUrl').value.trim();
+    if (!workerUrl) { showStatus('Please enter your Cloudflare Worker URL.', 'error'); return; }
     const company = document.getElementById('custCompany').value;
     const custEmail = document.getElementById('custEmail').value;
     const phone = document.getElementById('custPhone').value;
@@ -822,14 +821,14 @@ Example:
     };
 
     try {
-      await fetch(zapierUrl, {
+      await fetch(workerUrl, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       // no-cors mode: request was sent, Zapier will process it
-      showStatus('✅ Order sent to Zapier! Check Printavo in 30 seconds for the new invoice.', 'success');
+      showStatus('✅ ✅ Order sent to Printavo via Cloudflare! Check Printavo in 30 seconds.', 'success');
       setTimeout(() => clearAll(), 3000);
     } catch(e) {
       showStatus('Error sending to Zapier: ' + e.message, 'error');
