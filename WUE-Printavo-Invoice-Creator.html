@@ -725,13 +725,11 @@ Example:
     if (!url) { showStatus('Please enter your Cloudflare Worker URL.', 'error'); return; }
     showStatus('Testing Cloudflare connection...', 'loading');
     try {
-      // Use no-cors mode — Zapier accepts the request but browser won't see the response
       const testRes = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test: true, source: 'WUE Invoice Creator' })
       });
-      // no-cors always "succeeds" from browser perspective
       document.getElementById('apiDot').className = 'api-dot on';
       document.getElementById('connStatus').style.color = 'var(--accent)';
       document.getElementById('connStatus').textContent = '✓ Connected';
@@ -823,7 +821,6 @@ Example:
     try {
       await fetch(workerUrl, {
         method: 'POST',
-        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
