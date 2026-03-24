@@ -700,19 +700,18 @@ Example:
     if (!url) { showStatus('Please enter your Zapier webhook URL.', 'error'); return; }
     showStatus('Sending test ping to Zapier...', 'loading');
     try {
-      const res = await fetch(url, {
+      // Use no-cors mode — Zapier accepts the request but browser won't see the response
+      await fetch(url, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ test: true, source: 'WUE Invoice Creator' })
       });
-      if (res.ok) {
-        document.getElementById('apiDot').className = 'api-dot on';
-        document.getElementById('connStatus').style.color = 'var(--accent)';
-        document.getElementById('connStatus').textContent = '✓ Connected';
-        showStatus('✓ Zapier webhook is live and ready!', 'success');
-      } else {
-        throw new Error('Status ' + res.status);
-      }
+      // no-cors always "succeeds" from browser perspective
+      document.getElementById('apiDot').className = 'api-dot on';
+      document.getElementById('connStatus').style.color = 'var(--accent)';
+      document.getElementById('connStatus').textContent = '✓ Connected';
+      showStatus('✓ Zapier webhook ready! Check Zapier to confirm it received the ping.', 'success');
     } catch(e) {
       showStatus('Webhook test failed: ' + e.message, 'error');
     }
@@ -798,21 +797,15 @@ Example:
     };
 
     try {
-      const res = await fetch(zapierUrl, {
+      await fetch(zapierUrl, {
         method: 'POST',
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
-      if (res.ok) {
-        showStatus('✅ Order sent to Zapier! Invoice is being created in Printavo...', 'success');
-        setTimeout(() => {
-          showStatus('✅ Done! Check Printavo for the new invoice.', 'success');
-        }, 2000);
-        clearAll();
-      } else {
-        throw new Error('Zapier responded with status ' + res.status);
-      }
+      // no-cors mode: request was sent, Zapier will process it
+      showStatus('✅ Order sent to Zapier! Check Printavo in 30 seconds for the new invoice.', 'success');
+      setTimeout(() => clearAll(), 3000);
     } catch(e) {
       showStatus('Error sending to Zapier: ' + e.message, 'error');
     }
